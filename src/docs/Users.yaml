@@ -1,0 +1,198 @@
+paths:
+  /api/users:
+    get:
+      summary: Obtener todos los usuarios
+      tags:
+        - Users
+      description: Retorna una lista con todos los usuarios registrados en el sistema.
+      responses:
+        "200":
+          description: Lista de usuarios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+        "500":
+          description: Error interno del servidor
+
+  /api/users/{uid}:
+    get:
+      summary: Obtener un usuario por ID
+      tags:
+        - Users
+      description: Retorna un usuario específico según su ID.
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: ID del usuario (MongoDB ObjectId)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Usuario encontrado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    $ref: "#/components/schemas/User"
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno del servidor
+
+    put:
+      summary: Actualizar un usuario
+      tags:
+        - Users
+      description: Actualiza los datos de un usuario existente según su ID.
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: ID del usuario (MongoDB ObjectId)
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Usuario actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: User updated
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno del servidor
+
+    delete:
+      summary: Eliminar un usuario
+      tags:
+        - Users
+      description: Elimina un usuario del sistema según su ID.
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: ID del usuario (MongoDB ObjectId)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Usuario eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: User deleted
+        "500":
+          description: Error interno del servidor
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID autogenerado por MongoDB
+          example: "644bcc7f0e4a1a2b3c4d5e6f"
+        first_name:
+          type: string
+          description: Nombre del usuario
+          example: "Juan"
+        last_name:
+          type: string
+          description: Apellido del usuario
+          example: "Pérez"
+        email:
+          type: string
+          description: Correo electrónico del usuario
+          example: "juan.perez@email.com"
+        password:
+          type: string
+          description: Contraseña hasheada del usuario
+        role:
+          type: string
+          description: Rol del usuario en el sistema
+          enum:
+            - user
+            - admin
+          default: user
+          example: "user"
+        pets:
+          type: array
+          description: Lista de IDs de mascotas asociadas al usuario
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                description: ID de la mascota
+                example: "644bcc7f0e4a1a2b3c4d5e70"
+
+    UserUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: Nombre del usuario
+          example: "Juan"
+        last_name:
+          type: string
+          description: Apellido del usuario
+          example: "Pérez"
+        email:
+          type: string
+          description: Correo electrónico del usuario
+          example: "juan.perez@email.com"
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: string
+          example: "User not found"
